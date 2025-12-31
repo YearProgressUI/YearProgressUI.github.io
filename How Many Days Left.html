@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Year Progress</title>
+    <!-- Fonts used in the original design -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;1,500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0a0a0a;
+            --dot-passed: #7b8aff;
+            --dot-remaining: #1c1c1c;
+            --text-main: #ffffff;
+            --text-dim: #666666;
+            --text-accent: #ff4d4d;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 360px;
+            padding: 20px;
+            text-align: center;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        header {
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.8rem;
+            margin-bottom: 4px;
+            font-weight: 500;
+            letter-spacing: -1px;
+        }
+
+        #date-display {
+            color: var(--text-dim);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* The Dot Grid */
+        .dot-grid {
+            display: grid;
+            /* 13 columns to match the visual rhythm of the image */
+            grid-template-columns: repeat(13, 1fr);
+            gap: 10px;
+            margin-bottom: 40px;
+            justify-items: center;
+        }
+
+        .dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+        }
+
+        .dot.passed {
+            background-color: var(--dot-passed);
+            box-shadow: 0 0 8px rgba(123, 138, 255, 0.3);
+        }
+
+        .dot.remaining {
+            background-color: var(--dot-remaining);
+        }
+
+        /* Footer Stats */
+        footer {
+            font-size: 0.95rem;
+            font-weight: 500;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .red-text {
+            color: var(--text-accent);
+        }
+
+        .percentage-text {
+            color: var(--text-dim);
+        }
+
+        .divider {
+            color: var(--text-dim);
+            opacity: 0.5;
+        }
+
+        /* Mobile adjustments */
+        @media (max-width: 380px) {
+            .dot-grid { gap: 8px; }
+            .dot { width: 7px; height: 7px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1 id="year-display">----</h1>
+            <p id="date-display">-- -- ----</p>
+        </header>
+
+        <div id="dot-grid" class="dot-grid">
+            <!-- JavaScript will fill this -->
+        </div>
+
+        <footer>
+            <span id="days-left" class="red-text">0d left</span>
+            <span class="divider">·</span>
+            <span id="percentage" class="percentage-text">0%</span>
+        </footer>
+    </div>
+
+    <script>
+        function updateUI() {
+            const now = new Date();
+            const year = now.getFullYear();
+            
+            // 1. Update Header
+            document.getElementById('year-display').innerText = year;
+            const options = { weekday: 'long', month: 'long', day: 'numeric' };
+            document.getElementById('date-display').innerText = now.toLocaleDateString('en-US', options);
+
+            // 2. Calculate Progress
+            const start = new Date(year, 0, 1);
+            const end = new Date(year + 1, 0, 1);
+            const totalDays = Math.floor((end - start) / (1000 * 60 * 60 * 24));
+            
+            const diff = now - start;
+            const currentDay = Math.floor(diff / (1000 * 60 * 60 * 24)) + 1;
+            
+            const daysLeft = totalDays - currentDay;
+            const percent = Math.floor((currentDay / totalDays) * 100);
+
+            // 3. Update Footer
+            document.getElementById('days-left').innerText = `${daysLeft}d left`;
+            document.getElementById('percentage').innerText = `${percent}%`;
+
+            // 4. Draw Dots
+            const grid = document.getElementById('dot-grid');
+            grid.innerHTML = ''; 
+
+            for (let i = 1; i <= totalDays; i++) {
+                const dot = document.createElement('div');
+                dot.classList.add('dot');
+                
+                if (i <= currentDay) {
+                    dot.classList.add('passed');
+                } else {
+                    dot.classList.add('remaining');
+                }
+                
+                grid.appendChild(dot);
+            }
+        }
+
+        // Run immediately
+        updateUI();
+
+        // Check for updates every hour
+        setInterval(updateUI, 3600000);
+    </script>
+</body>
+</html>
