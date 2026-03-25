@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<!-- saved from url=(0033)https://yearprogressui.github.io/ -->
+<html lang="en" style="--vsc-domain: &quot;yearprogressui.github.io&quot;;">
 <head>
-    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Year Progress</title>
     <!-- Fonts used in the original design -->
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;1,500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <link href="./Year Progress_files/css2" rel="stylesheet">
     <style>
         :root {
             --bg-color: #0a0a0a;
@@ -125,18 +126,20 @@
 
     <div class="container">
         <header>
-            <h1 id="year-display">----</h1>
-            <p id="date-display">-- -- ----</p>
+            <h1 id="year-display">2026</h1>
+            <p id="date-display">Wednesday, March 25</p>
         </header>
 
-        <div id="dot-grid" class="dot-grid">
-            <!-- JavaScript will fill this -->
-        </div>
+        <!-- Left empty initially because JS fills this instantly -->
+        <div id="dot-grid" class="dot-grid"></div>
 
         <footer>
-            <span id="days-left" class="red-text">0d left</span>
+            <!-- Added the "Day out of Year" display here -->
+            <span id="day-current" class="percentage-text">84 of 365</span>
             <span class="divider">·</span>
-            <span id="percentage" class="percentage-text">0%</span>
+            <span id="days-left" class="red-text">281d left</span>
+            <span class="divider">·</span>
+            <span id="percentage" class="percentage-text">23%</span>
         </footer>
     </div>
 
@@ -153,15 +156,20 @@
             // 2. Calculate Progress
             const start = new Date(year, 0, 1);
             const end = new Date(year + 1, 0, 1);
-            const totalDays = Math.floor((end - start) / (1000 * 60 * 60 * 24));
             
-            const diff = now - start;
-            const currentDay = Math.floor(diff / (1000 * 60 * 60 * 24)) + 1;
+            // Using Math.round helps avoid edge cases caused by Daylight Saving Time shifts
+            const totalDays = Math.round((end - start) / (1000 * 60 * 60 * 24));
+            
+            // Get today at exactly midnight to accurately calculate the day of the year
+            const today = new Date(year, now.getMonth(), now.getDate());
+            const diff = today - start;
+            const currentDay = Math.round(diff / (1000 * 60 * 60 * 24)) + 1;
             
             const daysLeft = totalDays - currentDay;
             const percent = Math.floor((currentDay / totalDays) * 100);
 
             // 3. Update Footer
+            document.getElementById('day-current').innerText = `${currentDay} of ${totalDays}`;
             document.getElementById('days-left').innerText = `${daysLeft}d left`;
             document.getElementById('percentage').innerText = `${percent}%`;
 
